@@ -61,16 +61,27 @@ const RemoveBackground = () => {
 
         <p className="text-sm font-medium">Recipient Type</p>
         <select
-          value={recipientType}
-          onChange={(e) => setRecipientType(e.target.value)}
-          className="w-full p-2 mt-2 text-sm rounded-xl border border-white/30 bg-white/10 backdrop-blur-md placeholder-white text-white focus:outline-none focus:border-cyan-400"
-        >
-          <option>Client</option>
-          <option>Manager</option>
-          <option>Colleague</option>
-          <option>Professor</option>
-          <option>General Audience</option>
-        </select>
+  value={recipientType}
+  onChange={(e) => setRecipientType(e.target.value)}
+  className="w-full p-2 mt-2 text-sm rounded-xl border border-white/30 
+             bg-[#1a1a1a]/90 text-gray-200 
+             focus:outline-none focus:border-cyan-400"
+>
+  <option className="bg-black text-white">Client</option>
+  <option className="bg-black text-white">Manager</option>
+  <option className="bg-black text-white">Colleague</option>
+  <option className="bg-black text-white">Professor</option>
+  <option className="bg-black text-white">General Audience</option>
+</select>
+
+<textarea
+  placeholder="Write key points for the email (e.g., meeting reminder, project update, request)..."
+  value={keyPoints}
+  onChange={(e) => setKeyPoints(e.target.value)}
+  className="w-full p-3 mt-2 rounded-xl border border-white/30 
+             bg-[#1a1a1a]/90 text-gray-200 placeholder-gray-400
+             focus:outline-none focus:border-cyan-400 min-h-[6rem]"
+/>
 
         <p className="text-sm font-medium">Tone</p>
         <div className="flex gap-3 flex-wrap">
