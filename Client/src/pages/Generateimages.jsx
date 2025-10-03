@@ -1,4 +1,4 @@
-import { Sparkles, Copy, Play } from "lucide-react";
+import { Zap, Copy, ExternalLink } from "lucide-react";
 import React, { useState } from "react";
 import axios from "axios";
 import { useAuth } from "@clerk/clerk-react";
@@ -7,41 +7,31 @@ import Markdown from "react-markdown";
 
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 
-const LanguageAssistant = () => {
-  const modes = ["translate", "quiz", "suggest"];
-  const languages = ["Spanish", "French", "German", "Japanese", "Chinese"];
-
-  const [input, setInput] = useState("");
-  const [selectedMode, setSelectedMode] = useState("translate");
-  const [targetLanguage, setTargetLanguage] = useState("Spanish");
+const ResearchAssistant = () => {
+  const [topic, setTopic] = useState("");
+  const [filters, setFilters] = useState("");
   const [loading, setLoading] = useState(false);
   const [content, setContent] = useState("");
-  const [audioUrl, setAudioUrl] = useState("");
 
   const { getToken } = useAuth();
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    if (!input) return toast.error("Please enter text to learn.");
+    if (!topic) return toast.error("Enter a topic to research.");
 
     try {
       setLoading(true);
-
       const { data } = await axios.post(
         "/api/ai/generate-image",
-        { text: input, targetLanguage, mode: selectedMode },
+        { topic, filters },
         { headers: { Authorization: `Bearer ${await getToken()}` } }
       );
 
-      if (!data.success) {
-        toast.error(data.message || "Something went wrong");
-        return;
-      }
+      if (!data.success) return toast.error(data.message || "Something went wrong");
 
       setContent(data.content);
-      setAudioUrl(data.audioUrl || "");
-    } catch (error) {
-      toast.error(error.message);
+    } catch (err) {
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
@@ -58,82 +48,54 @@ const LanguageAssistant = () => {
   };
 
   return (
-    <div className="h-full overflow-y-scroll p-6 flex items-start flex-wrap gap-4 text-slate-700">
-      {/* Left column */}
+    <div className="h-full w-full p-6 flex flex-col lg:flex-row gap-6 font-mono bg-[#0D0D0D] text-[#00FFF0] overflow-y-scroll">
+      
+      {/* Left Panel */}
       <form
         onSubmit={onSubmitHandler}
-        className="w-full max-w-lg p-4 bg-white rounded-lg border border-gray-200"
+        className="w-full lg:w-1/2 p-5 bg-[#111111] rounded-xl border border-[#00FFF0] shadow-neon"
       >
-        <div className="flex items-center gap-3">
-          <Sparkles className="w-6 text-[#8E37EB]" />
-          <h1 className="text-xl font-semibold">Language Learning Assistant</h1>
-        </div>
+        <h1 className="text-2xl font-bold text-[#FF00FF] flex items-center gap-2 mb-6">
+          <Zap className="animate-pulse w-6 h-6" />
+          Research AI Console
+        </h1>
 
-        <p className="mt-4 text-sm font-medium">Text to Learn</p>
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          rows={4}
-          className="w-full p-2 px-3 mt-2 outline-none text-sm rounded-md border border-gray-300"
-          placeholder="Enter the text you want to practice..."
+        <label className="text-[#00FFF0] text-sm font-semibold">Topic</label>
+        <input
+          type="text"
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+          placeholder="Enter topic..."
+          className="w-full mt-2 p-3 rounded-md bg-[#111111] border border-[#FF00FF] text-[#00FFF0] placeholder:text-[#555] focus:outline-none focus:ring-2 focus:ring-[#FF00FF]"
           required
         />
 
-        <p className="mt-4 text-sm font-medium">Mode</p>
-        <div className="mt-2 flex gap-3 flex-wrap">
-          {modes.map((mode) => (
-            <span
-              key={mode}
-              onClick={() => setSelectedMode(mode)}
-              className={`text-xs px-4 py-1 border rounded-full cursor-pointer ${
-                selectedMode === mode
-                  ? "bg-purple-50 text-purple-700 border-purple-300"
-                  : "text-gray-500 border-gray-300"
-              }`}
-            >
-              {mode}
-            </span>
-          ))}
-        </div>
-
-        <p className="mt-4 text-sm font-medium">Target Language</p>
-        <div className="mt-2 flex gap-3 flex-wrap">
-          {languages.map((lang) => (
-            <span
-              key={lang}
-              onClick={() => setTargetLanguage(lang)}
-              className={`text-xs px-4 py-1 border rounded-full cursor-pointer ${
-                targetLanguage === lang
-                  ? "bg-purple-50 text-purple-700 border-purple-300"
-                  : "text-gray-500 border-gray-300"
-              }`}
-            >
-              {lang}
-            </span>
-          ))}
-        </div>
+        <label className="text-[#00FFF0] text-sm font-semibold mt-4">Filters (optional)</label>
+        <input
+          type="text"
+          value={filters}
+          onChange={(e) => setFilters(e.target.value)}
+          placeholder='e.g., year>2020, domain:"AI"'
+          className="w-full mt-2 p-3 rounded-md bg-[#111111] border border-[#FF00FF] text-[#00FFF0] placeholder:text-[#555] focus:outline-none focus:ring-2 focus:ring-[#FF00FF]"
+        />
 
         <button
+          type="submit"
           disabled={loading}
-          className="w-full flex justify-center items-center gap-2 bg-gradient-to-r from-[#C341F6] to-[#8E37EB] text-white px-4 py-2 mt-6 text-sm rounded-lg cursor-pointer"
+          className="w-full mt-6 p-3 rounded-lg text-[#0D0D0D] font-bold bg-gradient-to-r from-[#FF00FF] to-[#00FFF0] hover:scale-105 transform transition-all"
         >
-          {loading ? (
-            <span className="w-4 h-4 my-1 rounded-full border-2 border-t-transparent animate-spin"></span>
-          ) : (
-            <Sparkles className="w-5" />
-          )}
-          Generate
+          {loading ? "Loading..." : "Generate Insights"}
         </button>
       </form>
 
-      {/* Right column */}
-      <div className="w-full max-w-lg bg-white rounded-lg flex flex-col border border-gray-200 min-h-[24rem] p-4">
-        <div className="flex items-center justify-between p-2 border-b">
-          <h1 className="text-xl font-semibold">Generated Output</h1>
+      {/* Right Panel */}
+      <div className="w-full lg:w-1/2 p-5 bg-[#111111] rounded-xl border border-[#00FFF0] shadow-neon flex flex-col">
+        <div className="flex justify-between items-center mb-4 border-b border-[#FF00FF] pb-2">
+          <h2 className="text-lg font-bold text-[#FF00FF]">Output</h2>
           {content && (
             <button
               onClick={copyToClipboard}
-              className="flex items-center gap-1 text-sm text-purple-600 hover:underline"
+              className="flex items-center gap-1 text-sm text-[#00FFF0] hover:text-[#FF00FF]"
             >
               <Copy className="w-4 h-4" /> Copy
             </button>
@@ -141,19 +103,12 @@ const LanguageAssistant = () => {
         </div>
 
         {!content ? (
-          <div className="flex-1 flex justify-center items-center">
-            <p className="text-gray-400 text-sm mt-6">
-              Enter text and click "Generate" to get started
-            </p>
-          </div>
+          <p className="text-[#555] mt-6 text-sm">
+            Enter a topic and click "Generate Insights" to get results
+          </p>
         ) : (
-          <div className="mt-3 h-full overflow-y-scroll text-sm text-slate-600">
+          <div className="overflow-y-scroll text-[#00FFF0] text-sm mt-2 space-y-4">
             <Markdown>{content}</Markdown>
-            {audioUrl && (
-              <audio controls src={audioUrl} className="mt-3 w-full">
-                Your browser does not support the audio element.
-              </audio>
-            )}
           </div>
         )}
       </div>
@@ -161,4 +116,4 @@ const LanguageAssistant = () => {
   );
 };
 
-export default LanguageAssistant;
+export default ResearchAssistant;

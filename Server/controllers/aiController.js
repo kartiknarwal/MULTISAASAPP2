@@ -137,64 +137,67 @@ export const generateBlogTitle = async (req, res) => {
 
 
 
+
 // export const generateImage = async (req, res) => {
+//   try {
+//     const { userId } = req.auth(); // For Clerk middleware
+//     const { text, targetLanguage, mode } = req.body; // text to learn, target language, and mode (translate/quiz)
+//     const plan = req.plan;
 
-export const generateImage = async (req, res) => {
-  try {
-    const { userId } = req.auth(); // For Clerk middleware
-    const { text, targetLanguage, mode } = req.body; // text to learn, target language, and mode (translate/quiz)
-    const plan = req.plan;
+//     if (!userId) {
+//       return res.status(401).json({ success: false, message: "Unauthorized" });
+//     }
 
-    if (!userId) {
-      return res.status(401).json({ success: false, message: "Unauthorized" });
-    }
+//     if (plan !== "premium") {
+//       return res.status(403).json({
+//         success: false,
+//         message: "This feature is only available for premium subscriptions",
+//       });
+//     }
 
-    if (plan !== "premium") {
-      return res.status(403).json({
-        success: false,
-        message: "This feature is only available for premium subscriptions",
-      });
-    }
+//     if (!text || !targetLanguage || !mode) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Please provide text, targetLanguage, and mode",
+//       });
+//     }
 
-    if (!text || !targetLanguage || !mode) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide text, targetLanguage, and mode",
-      });
-    }
+//     // Build the AI prompt based on mode
+//     let prompt = "";
+//     if (mode === "translate") {
+//       prompt = `Translate the following text into ${targetLanguage} in a natural, human-like style:\n\n${text}`;
+//     } else if (mode === "quiz") {
+//       prompt = `Create a short language learning exercise for the following text in ${targetLanguage}:\n\n${text}\n- Include multiple-choice questions or fill-in-the-blank.`;
+//     } else {
+//       prompt = `Provide language learning suggestions for the following text in ${targetLanguage}:\n\n${text}`;
+//     }
 
-    // Build the AI prompt based on mode
-    let prompt = "";
-    if (mode === "translate") {
-      prompt = `Translate the following text into ${targetLanguage} in a natural, human-like style:\n\n${text}`;
-    } else if (mode === "quiz") {
-      prompt = `Create a short language learning exercise for the following text in ${targetLanguage}:\n\n${text}\n- Include multiple-choice questions or fill-in-the-blank.`;
-    } else {
-      prompt = `Provide language learning suggestions for the following text in ${targetLanguage}:\n\n${text}`;
-    }
+//     // Generate AI response
+//     const response = await AI.chat.completions.create({
+//       model: "gemini-2.0-flash",
+//       messages: [{ role: "user", content: prompt }],
+//       temperature: 0.7,
+//       max_tokens: 500,
+//     });
 
-    // Generate AI response
-    const response = await AI.chat.completions.create({
-      model: "gemini-2.0-flash",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
-      max_tokens: 500,
-    });
+//     const content = response.choices[0].message?.content || "";
 
-    const content = response.choices[0].message?.content || "";
+//     // Save to database
+//     await sql`
+//       INSERT INTO creations (user_id, prompt, content, type)
+//       VALUES (${userId}, ${text}, ${content}, 'language-learning')
+//     `;
 
-    // Save to database
-    await sql`
-      INSERT INTO creations (user_id, prompt, content, type)
-      VALUES (${userId}, ${text}, ${content}, 'language-learning')
-    `;
+//     res.json({ success: true, content });
+//   } catch (error) {
+//     console.error("Language Learning Assistant Error:", error);
+//     res.status(500).json({ success: false, message: error.message });
+//   }
+// };
 
-    res.json({ success: true, content });
-  } catch (error) {
-    console.error("Language Learning Assistant Error:", error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
+
+
+
 
 //   try {
 //     const { userId } = req.auth; // if using Clerk middleware
@@ -278,6 +281,73 @@ export const generateImage = async (req, res) => {
 //     res.json({ success: true, message: error.message });
 //   }
 // };
+
+
+export const generateImage = async (req, res) => {
+  try {
+    const { userId } = req.auth(); // Clerk middleware
+    const { topic, filters } = req.body; // topic + optional filters
+    const plan = req.plan;
+
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    if (plan !== "premium") {
+      return res.status(403).json({
+        success: false,
+        message: "This feature is only available for premium subscriptions",
+      });
+    }
+
+    if (!topic) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide a topic to research",
+      });
+    }
+
+    // Build AI prompt for structured research output
+    let prompt = `You are an advanced research assistant.
+
+Topic: "${topic}"`;
+    if (filters) prompt += `, considering these filters: ${JSON.stringify(filters)}`;
+    prompt += `
+Provide a structured output including:
+
+1. **Summary**: Concise, all-in-one human-friendly summary.
+2. **Key Insights**: Categorized under Trends & Patterns, Recent Advances, Challenges, Practical Applications.
+3. **Top References**: 3-5 highly cited or influential papers/articles with short descriptions of why they are important.
+4. **Recommendations**: Practical next steps for someone who wants to explore this topic further.
+5. **Optional Visuals**: Include simple Markdown diagrams, tables, or flowcharts if useful.
+
+Present everything clearly in a structured, readable format.`;
+
+    // Generate AI response
+    const response = await AI.chat.completions.create({
+      model: "gemini-2.0-flash",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.7,
+      max_tokens: 1000,
+    });
+
+    const content = response.choices[0].message?.content || "";
+
+    // Save to database
+    await sql`
+      INSERT INTO creations (user_id, prompt, content, type)
+      VALUES (${userId}, ${topic}, ${content}, 'research-insights')
+    `;
+
+    res.json({ success: true, content });
+  } catch (error) {
+    console.error("Research & Insights Assistant Error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+
 
 export const removeImageBackground = async (req, res) => {
   try {
@@ -401,52 +471,103 @@ import fetch from "node-fetch";
 
 export const removeImageObject = async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ success: false, message: "No image uploaded" });
+    const { topic } = req.body;
+    const { userId } = req.auth;
+    const plan = req.plan;
+
+    if (plan !== "premium") {
+      return res.status(403).json({ success: false, message: "Premium plan required." });
     }
 
-    const { prompt } = req.body; // e.g. "remove watch"
-    if (!prompt) {
-      return res.status(400).json({ success: false, message: "Missing object removal prompt" });
+    if (!topic) {
+      return res.status(400).json({ success: false, message: "Please provide a topic." });
     }
 
-    const filePath = req.file.path;
+    // Prompt Gemini for structured slide outline
 
-    // Call ClipDrop API
-    const formData = new FormData();
-    formData.append("image_file", fs.createReadStream(filePath));
-    formData.append("prompt", prompt);
+   const prompt = `
+You are an expert AI assistant creating professional slide decks.
 
-    const response = await fetch("https://clipdrop-api.co/remove-object/v1", {
-      method: "POST",
-      headers: {
-        "x-api-key": process.env.CLIPDROP_API_KEY
-      },
-      body: formData
+Task:
+- Given a topic, create a slide-by-slide outline in Markdown, exactly 5 slides.
+- Make the slide titles **bold, large, and visually distinct** using Markdown.
+- Use bullet points for main content. You can also number the bullets.
+- Use bold or italics to emphasize key terms or metrics.
+- If a slide contains numeric data, format it clearly for charts.
+- For process/workflow slides, include "flowchart:" lines using Mermaid syntax.
+- Make the content clear, concise, and professional-level.
+- Add horizontal separators "---" between slides for clarity in the preview.
+
+Format Example:
+
+# Slide 1: Executive Summary
+- **Key Insight 1:** Explanation
+- **Key Insight 2:** Explanation
+- Summary in 2-3 lines.
+
+---
+
+# Slide 2: Market Overview
+- Trend 1
+- Trend 2
+- Key Statistics
+- Chart Data:
+  - Title: Market Growth
+  - Type: Bar Chart
+  - Data: Q1: 20, Q2: 35, Q3: 50, Q4: 65
+
+---
+
+# Slide 3: Strategy
+- Step 1: Description
+- Step 2: Description
+- Step 3: Description
+- flowchart:
+graph TD
+  A[Start] --> B[Step 1]
+  B --> C[Step 2]
+  C --> D[Step 3]
+  D --> E[End]
+
+---
+
+# Slide 4: Key Metrics
+- Metric 1: Value
+- Metric 2: Value
+- Metric 3: Value
+- Chart Data:
+  - Title: Performance Metrics
+  - Type: Line Chart
+  - Data: Jan: 100, Feb: 150, Mar: 200, Apr: 250
+
+---
+
+# Slide 5: Recommendations
+- Recommendation 1
+- Recommendation 2
+- Recommendation 3
+- **Concluding statement** summarizing actionable insights
+
+Topic: ${topic}
+`;
+
+
+    const response = await AI.chat.completions.create({
+      model: "gemini-2.0-flash",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.7,
+      max_tokens: 1200,
     });
 
-    if (!response.ok) {
+    const content = response.choices[0].message?.content || "No content generated.";
 
-      throw new Error(`ClipDrop API error: ${response.status} ${response.statusText}`);
-    }
+    // Save in database
+    await sql`
+      INSERT INTO creations (user_id, prompt, content, type)
+      VALUES (${userId}, 'Slide Deck Generator', ${content}, 'slides')
+    `;
 
-    const buffer = Buffer.from(await response.arrayBuffer());
-
-    // Upload to Cloudinary
-    const uploadResult = await cloudinary.uploader.upload_stream(
-      { folder: "removed-objects" },
-      (error, result) => {
-        if (error) {
-          console.error("Cloudinary upload error:", error);
-          return res.status(500).json({ success: false, message: "Cloudinary upload failed" });
-        }
-        return res.json({ success: true, url: result.secure_url });
-      }
-    );
-
-    const stream = uploadResult;
-    stream.end(buffer);
-
+    res.json({ success: true, content });
   } catch (error) {
     console.error("removeImageObject error:", error);
     res.status(500).json({ success: false, message: error.message });

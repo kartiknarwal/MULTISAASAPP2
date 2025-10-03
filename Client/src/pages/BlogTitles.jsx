@@ -16,7 +16,7 @@ const BlogTitles = () => {
   ];
 
   const [selectedLength, setSelectedLength] = useState(summaryLengths[0]);
-  const [input, setInput] = useState(''); // meeting transcript
+  const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [content, setContent] = useState('');
 
@@ -55,37 +55,40 @@ const BlogTitles = () => {
   };
 
   return (
-    <div className="h-full overflow-y-scroll p-6 flex flex-col lg:flex-row items-start gap-6 text-slate-700">
+    <div className="min-h-screen w-full p-6 flex flex-col lg:flex-row gap-6 
+      bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#312e81] text-gray-100">
+
       {/* Left Column */}
       <form
         onSubmit={onSubmitHandler}
-        className="w-full lg:w-1/2 max-w-lg p-4 bg-white rounded-lg border border-gray-200"
+        className="w-full lg:w-1/2 p-6 rounded-2xl shadow-xl 
+        bg-white/10 backdrop-blur-md border border-white/10"
       >
         <div className="flex items-center gap-3">
-          <Sparkles className="w-6 text-[#8E37EB]" />
+          <Sparkles className="w-6 text-purple-400" />
           <h1 className="text-xl font-semibold">Meeting Notes Summarizer</h1>
         </div>
 
-        <p className="mt-6 text-sm font-medium">Meeting Transcript</p>
+        <p className="mt-6 text-sm font-medium text-gray-300">Meeting Transcript</p>
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          className="w-full p-2 px-3 mt-2 outline-none text-sm rounded-md border border-gray-300 min-h-[6rem]"
+          className="w-full p-3 mt-2 rounded-lg bg-black/40 border border-white/20 text-sm 
+            focus:ring-2 focus:ring-purple-500 outline-none resize-none min-h-[6rem]"
           placeholder="Paste the transcript of your meeting here..."
           required
         />
 
-        <p className="mt-4 text-sm font-medium">Summary Length</p>
+        <p className="mt-4 text-sm font-medium text-gray-300">Summary Length</p>
         <div className="mt-3 flex gap-3 flex-wrap">
           {summaryLengths.map((item, index) => (
             <span
               key={index}
               onClick={() => setSelectedLength(item)}
-              className={`text-xs px-4 py-1 border rounded-full cursor-pointer ${
-                selectedLength.text === item.text
-                  ? 'bg-purple-50 text-purple-700 border-purple-300'
-                  : 'text-gray-500 border-gray-300'
-              }`}
+              className={`px-4 py-1 text-xs rounded-full cursor-pointer transition-all 
+                ${selectedLength.text === item.text
+                  ? 'bg-purple-600 text-white border border-purple-400'
+                  : 'bg-black/40 text-gray-300 border border-white/20 hover:bg-purple-500/30'}`}
             >
               {item.text}
             </span>
@@ -95,10 +98,12 @@ const BlogTitles = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full flex justify-center items-center gap-2 bg-gradient-to-r from-[#C341F6] to-[#8E37EB] text-white px-4 py-2 mt-6 text-sm rounded-lg cursor-pointer disabled:opacity-60"
+          className="w-full flex justify-center items-center gap-2 
+            bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 mt-6 
+            text-sm rounded-lg cursor-pointer disabled:opacity-60 hover:scale-[1.02] transition"
         >
           {loading ? (
-            <span className="w-4 h-4 my-1 rounded-full border-2 border-t-transparent animate-spin"></span>
+            <span className="w-4 h-4 my-1 rounded-full border-2 border-t-transparent border-white animate-spin"></span>
           ) : (
             <Hash className="w-5" />
           )}
@@ -107,16 +112,18 @@ const BlogTitles = () => {
       </form>
 
       {/* Right Column */}
-      <div className="w-full lg:w-1/2 max-w-lg bg-white rounded-lg flex flex-col border border-gray-200 min-h-[24rem] max-h-[600px] p-4">
-        <div className="flex items-center justify-between p-4 border-b">
+      <div className="w-full lg:w-1/2 rounded-2xl shadow-xl 
+        bg-white/10 backdrop-blur-md border border-white/10 p-6 flex flex-col">
+        
+        <div className="flex items-center justify-between border-b border-white/10 pb-3">
           <div className="flex items-center gap-3">
-            <Hash className="w-5 h-5 text-[#8E37EB]" />
+            <Hash className="w-5 h-5 text-purple-400" />
             <h1 className="text-xl font-semibold">Generated Summary</h1>
           </div>
           {content && (
             <button
               onClick={copyToClipboard}
-              className="flex items-center gap-1 text-sm text-purple-600 hover:underline"
+              className="flex items-center gap-1 text-sm text-purple-400 hover:text-purple-300"
             >
               <Copy className="w-4 h-4" /> Copy
             </button>
@@ -131,10 +138,8 @@ const BlogTitles = () => {
             </div>
           </div>
         ) : (
-          <div className="mt-3 h-full overflow-y-scroll text-sm text-slate-600">
-            <div className="reset-tw">
-              <Markdown>{content}</Markdown>
-            </div>
+          <div className="mt-3 h-full overflow-y-scroll text-sm leading-relaxed text-gray-200">
+            <Markdown>{content}</Markdown>
           </div>
         )}
       </div>

@@ -33,11 +33,8 @@ const ReviewResume = () => {
         },
       });
 
-      if (data.success) {
-        setContent(data.content);
-      } else {
-        toast.error(data.message || "Something went wrong");
-      }
+      if (data.success) setContent(data.content);
+      else toast.error(data.message || "Something went wrong");
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -46,68 +43,72 @@ const ReviewResume = () => {
   };
 
   return (
-    <div className="h-full overflow-y-scroll p-6 flex items-start flex-wrap gap-4 text-slate-700">
-      {/* Left col */}
+    <div className="h-full flex flex-col lg:flex-row gap-6 p-6 bg-[#0C0D2E] text-white">
+      {/* Sidebar Placeholder */}
+      <div className="w-full lg:w-1/5 flex flex-col gap-4 p-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/20">
+        <h2 className="text-lg font-semibold text-[#00DA83]">Dashboard</h2>
+        <div className="flex flex-col gap-2">
+          <div className="p-2 rounded-lg hover:bg-[#00DA83]/20 transition cursor-pointer">Resume Analysis</div>
+          <div className="p-2 rounded-lg hover:bg-[#FF1493]/20 transition cursor-pointer">Job Matches</div>
+          {/* <div className="p-2 rounded-lg hover:bg-[#00FFFF]/20 transition cursor-pointer">Settings</div> */}
+        </div>
+      </div>
+
+      {/* Main Form */}
       <form
         onSubmit={onSubmitHandler}
-        className="w-full max-w-lg p-4 bg-white rounded-lg border border-gray-200"
+        className="w-full lg:w-2/5 p-6 rounded-3xl bg-white/10 backdrop-blur-2xl border border-white/20 flex flex-col gap-4 transform transition hover:scale-[1.02] shadow-xl"
       >
-        <div className="flex items-center gap-3">
-          <Sparkles className="w-6 text-[#00DA83]" />
-          <h1 className="text-xl font-semibold">Resume & JD Matcher</h1>
+        <div className="flex items-center gap-3 animate-bounce">
+          <Sparkles className="w-6 h-6 text-[#00DA83] drop-shadow-[0_0_8px_#00DA83]" />
+          <h1 className="text-2xl font-bold tracking-wide drop-shadow-[0_0_8px_#00FFFF]">
+            Resume & JD Matcher
+          </h1>
         </div>
 
-        {/* Resume Upload */}
-        <p className="mt-6 text-sm font-medium">Upload Resume</p>
+        <p className="text-sm font-medium text-[#00FFFF]">Upload Resume</p>
         <input
           type="file"
           accept="application/pdf"
           onChange={(e) => setInput(e.target.files[0])}
-          className="w-full p-2 px-3 mt-2 outline-none text-sm rounded-md border border-gray-300 text-gray-600"
+          className="w-full p-3 mt-2 border border-white/30 rounded-2xl bg-white/10 backdrop-blur-md text-white placeholder-white focus:outline-none focus:ring-2 focus:ring-[#00DA83] transition duration-300"
           required
         />
-        <p className="text-xs text-gray-500 font-light mt-1">
-          Supports PDF resumes only.
-        </p>
+        <p className="text-xs text-white/50 mt-1">PDF only</p>
 
-        {/* Job Description */}
-        <p className="mt-4 text-sm font-medium">Paste Job Description</p>
+        <p className="mt-4 text-sm font-medium text-[#FF1493]">Paste Job Description</p>
         <textarea
           rows={6}
           value={jobDescription}
           onChange={(e) => setJobDescription(e.target.value)}
-          placeholder="Paste the job description here..."
-          className="w-full p-2 mt-2 border border-gray-300 rounded-md text-sm outline-none"
+          placeholder="Paste job description here..."
+          className="w-full p-3 mt-2 border border-white/30 rounded-2xl bg-white/10 backdrop-blur-md text-white placeholder-white focus:outline-none focus:ring-2 focus:ring-[#FF1493] transition duration-300"
           required
         />
 
-        {/* Submit Button */}
         <button
           disabled={loading}
-          className="w-full flex justify-center items-center gap-2 bg-gradient-to-r from-[#00DA83] to-[#009BB3] text-white px-4 py-2 mt-6 text-sm rounded-lg cursor-pointer"
+          className="w-full mt-4 py-2 rounded-2xl bg-gradient-to-r from-[#00DA83] to-[#00FFFF] text-black font-semibold hover:from-[#00FFFF] hover:to-[#00DA83] relative overflow-hidden transition duration-300 flex justify-center items-center gap-2"
         >
           {loading ? (
-            <span className="w-4 h-4 my-1 rounded-full border-2 border-t-transparent animate-spin"></span>
+            <span className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin"></span>
           ) : (
-            <FileText className="w-5" />
+            <FileText className="w-5 h-5" />
           )}
           Match Resume
         </button>
       </form>
 
-      {/* Right col */}
-      <div className="w-full max-w-lg bg-white rounded-lg flex flex-col border border-gray-200 min-h-96 max-h-[600px] p-4 overflow-y-scroll">
-        <h2 className="text-lg font-semibold mb-3 text-[#00DA83]">Analysis Results</h2>
+      {/* Output Panel */}
+      <div className="w-full lg:w-2/5 p-6 rounded-3xl bg-white/10 backdrop-blur-2xl border border-white/20 flex flex-col min-h-[24rem] shadow-xl overflow-y-auto">
+        <h2 className="text-lg font-semibold mb-3 text-[#FF1493]">Analysis Results</h2>
 
         {!content ? (
-          <div className="flex-1 flex justify-center items-center text-gray-400">
-            <div className="text-sm flex flex-col items-center gap-5">
-              <FileText className="w-9 h-9" />
-              <p>Upload a resume and paste a job description to get started</p>
-            </div>
+          <div className="flex-1 flex justify-center items-center text-white/50 text-sm text-center">
+            Upload a resume and paste a job description to start
           </div>
         ) : (
-          <div className="prose text-slate-700">
+          <div className="p-2 prose prose-invert text-white/90">
             <Markdown>{content}</Markdown>
           </div>
         )}

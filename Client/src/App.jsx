@@ -3,25 +3,16 @@ import {Route, Routes} from 'react-router-dom'
 import Home from './pages/Home'
 import Layout from './pages/Layout'
 import Dashboard from './pages/Dashboard'
-import WriteArticle from './pages/WriteArticle'
-import BlogTitles from './pages/BlogTitles'
-import Generateimages from './pages/Generateimages'
+import WriteArticle from './pages/WriteArticle'       // old file kept
+import BlogTitles from './pages/BlogTitles'           // old file kept
+import Generateimages from './pages/Generateimages'   // old file kept
 import RemoveBackground from './pages/RemoveBackground'
 import RemoveObject from './pages/RemoveObject'
 import ReviewResume from './pages/ReviewResume'
 import Community from './pages/Community'
-import { useAuth } from '@clerk/clerk-react'
-import { useEffect } from 'react'
-import {Toaster}from 'react-hot-toast'
+import { Toaster } from 'react-hot-toast'
 
 const App = () => {
-
-  // const {getToken}  =useAuth()
-  // useEffect(()=>{
-  //    getToken().then((token)=>console.log(token));
-  // },[])
-
-  
   return (
     <div>
       <Toaster/>
@@ -29,14 +20,16 @@ const App = () => {
         <Route path='/' element={<Home/>}/>
         <Route path='/ai' element={<Layout/>}>
             <Route index element={<Dashboard/>} />
-            <Route path='write-article' element={<WriteArticle/>} />
-            <Route path='blog-titles' element={<BlogTitles/>} />
-            <Route path='generate-images' element={<Generateimages/>} />
-            <Route path='remove-background' element={<RemoveBackground/>} />
-            <Route path='remove-object' element={<RemoveObject/>} />
-            <Route path='review-resume' element={<ReviewResume/>} />
-            <Route path='community' element={<Community/>} />
 
+            {/* Repurpose old components into new tools */}
+            <Route path='summarizer' element={<WriteArticle/>} />
+            <Route path='meeting-notes' element={<BlogTitles/>} />
+            <Route path='research-assistant' element={<Generateimages/>} />
+            <Route path='email-composer' element={<RemoveBackground/>} />
+            <Route path='slide-deck' element={<RemoveObject/>} />
+            <Route path='resume-matcher' element={<ReviewResume/>} />
+
+            <Route path='community' element={<Community/>} />
         </Route>
       </Routes>
     </div>

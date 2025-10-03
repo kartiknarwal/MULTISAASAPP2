@@ -17,3 +17,20 @@
 .cl-drawerRoot{
   z-index: 10;
 }
+
+
+/* Light mode */
+.tool-bg-article { background: linear-gradient(135deg, #3588F2, #0BB0D7); }
+.tool-bg-blog    { background: linear-gradient(135deg, #B153EA, #E549A3); }
+.tool-bg-image   { background: linear-gradient(135deg, #20C363, #11B97E); }
+.tool-bg-bgremove{ background: linear-gradient(135deg, #F76C1C, #F04A3C); }
+.tool-bg-objremove{background: linear-gradient(135deg, #5C6AF1, #427DF5); }
+.tool-bg-resume  { background: linear-gradient(135deg, #12B7AC, #08B6CE); }
+
+/* Dark mode overrides */
+.dark .tool-bg-article { background: linear-gradient(135deg, #1a2b4f, #04465e); }
+.dark .tool-bg-blog    { background: linear-gradient(135deg, #502063, #7a2a5a); }
+.dark .tool-bg-image   { background: linear-gradient(135deg, #0f4a2f, #086654); }
+.dark .tool-bg-bgremove{ background: linear-gradient(135deg, #7a2d0a, #6a1e18); }
+.dark .tool-bg-objremove{background: linear-gradient(135deg, #2d357a, #1b3f7a); }
+.dark .tool-bg-resume  { background: linear-gradient(135deg, #0a4d49, #065e73); }
